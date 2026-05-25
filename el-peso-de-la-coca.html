@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El peso de la coca — Cátedra de Paz</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: #f5f4f0; color: #1a1a18; min-height: 100vh; }
+  #app { max-width: 600px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+  .screen { display: none; }
+  .screen.active { display: block; }
+  .chip { display: inline-block; font-size: 11px; letter-spacing: 1px; color: #888; margin-bottom: 0.5rem; }
+  .title-big { font-size: 28px; font-weight: 600; margin-bottom: 0.5rem; color: #1a1a18; }
+  .subtitle { font-size: 15px; color: #555; line-height: 1.7; margin-bottom: 2rem; }
+  .section-label { font-size: 12px; font-weight: 600; color: #888; letter-spacing: 0.5px; margin-bottom: 0.75rem; text-transform: uppercase; }
+  .card { background: #fff; border: 1px solid #e0ded6; border-radius: 14px; padding: 1rem 1.25rem; margin-bottom: 0.75rem; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
+  .card:hover { border-color: #b0aaa0; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+  .card.selected { border: 2px solid #378ADD; background: #f0f7ff; }
+  .card-title { font-size: 15px; font-weight: 600; color: #1a1a18; margin-bottom: 4px; }
+  .card-desc { font-size: 13px; color: #666; line-height: 1.55; }
+  .btn { display: inline-block; padding: 11px 22px; border: 1px solid #ccc; border-radius: 10px; background: #fff; color: #1a1a18; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.15s; }
+  .btn:hover { background: #f0ede8; }
+  .btn-primary { background: #1a1a18; color: #fff; border-color: #1a1a18; }
+  .btn-primary:hover { background: #333; }
+  .btn-outline { background: transparent; border: 1px solid #ccc; }
+  .progress-bar { height: 4px; background: #e0ded6; border-radius: 2px; margin-bottom: 1.75rem; }
+  .progress-fill { height: 4px; border-radius: 2px; background: #378ADD; transition: width 0.4s; }
+  .role-badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 20px; margin-bottom: 1.25rem; }
+  .scene-box { background: #fff; border: 1px solid #e0ded6; border-radius: 14px; padding: 1.25rem; margin-bottom: 1.25rem; }
+  .scene-year { font-size: 11px; color: #aaa; letter-spacing: 1px; margin-bottom: 8px; text-transform: uppercase; }
+  .scene-text { font-size: 15px; color: #1a1a18; line-height: 1.75; }
+  .decision-label { font-size: 13px; font-weight: 600; color: #555; margin-bottom: 0.75rem; }
+  .ending-box { border-radius: 14px; padding: 1.25rem; margin-bottom: 1rem; }
+  .ending-good { background: #e8f8f1; border-left: 4px solid #1D9E75; }
+  .ending-good .ending-title { color: #085041; }
+  .ending-neutral { background: #fff8ec; border-left: 4px solid #BA7517; }
+  .ending-neutral .ending-title { color: #633806; }
+  .ending-bad { background: #fef0f0; border-left: 4px solid #A32D2D; }
+  .ending-bad .ending-title { color: #501313; }
+  .ending-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .ending-text { font-size: 14px; line-height: 1.7; color: #333; }
+  .reflection { font-size: 13px; color: #777; line-height: 1.6; margin: 1rem 0; font-style: italic; padding: 0.75rem 1rem; background: #f5f4f0; border-radius: 10px; }
+  .stat-row { display: flex; gap: 10px; margin-bottom: 1.25rem; }
+  .stat { flex: 1; background: #fff; border: 1px solid #e0ded6; border-radius: 12px; padding: 0.85rem; text-align: center; }
+  .stat-num { font-size: 20px; font-weight: 700; color: #1a1a18; }
+  .stat-label { font-size: 11px; color: #888; margin-top: 3px; line-height: 1.3; }
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  @media (max-width: 400px) { .stat-row { flex-direction: column; } .btn-row { flex-direction: column; } }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="screen-intro" class="screen active">
+    <p class="chip">CÁTEDRA DE PAZ — GRADO 10° · LICEO DE LOS ANDES FUNED</p>
+    <h1 class="title-big">El peso de la coca</h1>
+    <p class="subtitle">Colombia, entre los años 80 y hoy. Elige tu personaje y toma decisiones reales. Cada elección tiene consecuencias — como en la vida.</p>
+    <p class="section-label">Elige quién eres</p>
+    <div id="role-cards">
+      <div class="card" onclick="selectRole(0)">
+        <div class="card-title">🌿 Campesino cocalero</div>
+        <div class="card-desc">Vives en el Putumayo. La tierra es tuya pero no tienes cómo sobrevivir con cultivos legales. Los narcos te ofrecen dinero.</div>
+      </div>
+      <div class="card" onclick="selectRole(1)">
+        <div class="card-title">🏙️ Joven de Medellín</div>
+        <div class="card-desc">Barrio popular de Medellín, años 90. El cartel recluta jóvenes del barrio. Tus amigos ya entraron.</div>
+      </div>
+      <div class="card" onclick="selectRole(2)">
+        <div class="card-title">🏘️ Habitante civil</div>
+        <div class="card-desc">Vives en un pueblo entre dos fuegos: guerrilla y paramilitares. Nadie te pregunta nada. La violencia llega sola.</div>
+      </div>
+      <div class="card" onclick="selectRole(3)">
+        <div class="card-title">🪖 Soldado del ejército</div>
+        <div class="card-desc">Eres parte de las fuerzas del Estado. Te mandan a zonas de conflicto donde el narco financia a los grupos armados.</div>
+      </div>
+    </div>
+    <br>
+    <button class="btn btn-primary" onclick="startGame()">Comenzar →</button>
+  </div>
+
+  <div id="screen-game" class="screen">
+    <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+    <div id="role-badge-container"></div>
+    <div class="scene-box">
+      <div class="scene-year" id="scene-year"></div>
+      <div class="scene-text" id="scene-text"></div>
+    </div>
+    <p class="decision-label" id="decision-label"></p>
+    <div id="choices"></div>
+  </div>
+
+  <div id="screen-ending" class="screen">
+    <p class="chip">RESULTADO FINAL</p>
+    <div id="ending-content"></div>
+    <div class="stat-row" id="stat-row"></div>
+    <div class="reflection" id="global-reflection"></div>
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="restart()">← Jugar de nuevo</button>
+      <button class="btn btn-primary" onclick="goToIntro()">Cambiar personaje</button>
+    </div>
+    <br>
+    <p style="font-size:12px;color:#aaa;text-align:center;">Creado por estudiante de grado 10° — Cátedra de Paz 2025</p>
+  </div>
+
+</div>
+<script>
+const roles = [
+  { name: "Campesino cocalero", place: "Putumayo", badge: "background:#e8f8f1;color:#085041", scenes: [
+    { year: "Colombia, 1990", text: "Tienes tres hijos y tus cosechas de yuca no alcanzan. Un intermediario del cartel llega al pueblo y ofrece pagarle a los campesinos 10 veces más por cultivar coca. El alcalde dice que no te metas. Tu vecino ya firmó.", decision: "¿Qué haces?", choices: [
+      { text: "Firmas con el intermediario — necesitas el dinero", points: -1, next: 1 },
+      { text: "Te niegas y buscas apoyo estatal para cultivos alternativos", points: 1, next: 2 }
+    ]},
+    { year: "Tres años después", text: "El dinero llegó, pero con él llegaron los armados. Tu parcela es parte de la ruta de tráfico. Un grupo paramilitar llega al pueblo diciendo que van a 'limpiar' colaboradores del cartel. Tienes miedo.", decision: "¿Qué decides?", choices: [
+      { text: "Abandonas todo y te desplazas a la ciudad", points: -1, next: 3 },
+      { text: "Te quedas y tratas de negociar con todos los bandos", points: 0, next: 4 }
+    ]},
+    { year: "Dos años después", text: "El programa de sustitución de cultivos llegó pero tarda. Tu familia pasa dificultades. Pero el pueblo mantiene cierta calma. Un líder comunitario te invita a organizarse.", decision: "¿Te sumas?", choices: [
+      { text: "Sí, te conviertes en líder comunitario por la sustitución", points: 2, next: 5 },
+      { text: "No, tienes miedo de quedar en la mira de los grupos armados", points: 0, next: 6 }
+    ]},
+    { year: "En la ciudad", text: "Llegaste a Bogotá sin nada. Trabajas de informal. Tus hijos crecen en una invasión. El conflicto te expulsó de tu tierra.", decision: null, choices: [], ending: "bad" },
+    { year: "En el pueblo", text: "Negociar entre grupos armados es imposible. Un enfrentamiento destruye parte del pueblo. Tu familia sobrevive pero pierdes todo lo que tenías.", decision: null, choices: [], ending: "neutral" },
+    { year: "Liderazgo comunitario", text: "El proceso fue lento y peligroso. Recibiste amenazas. Pero lograste que 40 familias entraran al programa de sustitución. Tu comunidad sigue en pie.", decision: null, choices: [], ending: "good" },
+    { year: "En el pueblo", text: "Te quedaste al margen. El conflicto siguió. Sobreviviste, pero tu comunidad quedó fragmentada y el Estado nunca llegó.", decision: null, choices: [], ending: "neutral" }
+  ]},
+  { name: "Joven de Medellín", place: "Medellín", badge: "background:#fff8ec;color:#633806", scenes: [
+    { year: "Medellín, 1993", text: "Tienes 16 años. El barrio está controlado por una banda aliada al Cartel de Medellín. Tu mejor amigo entró hace seis meses y ya tiene moto y plata. En tu casa no hay para el arriendo.", decision: "¿Qué haces?", choices: [
+      { text: "Entras a la banda — parece la única salida", points: -2, next: 1 },
+      { text: "Buscas trabajo legal aunque sea mal pagado", points: 1, next: 2 }
+    ]},
+    { year: "Seis meses después", text: "Estás en la banda. Haces mandados, cuidas esquinas. El dinero llega pero también el miedo. La policía hace redadas y tu amigo fue capturado.", decision: "¿Qué decides?", choices: [
+      { text: "Intentas salirte antes de que te pase algo", points: 1, next: 3 },
+      { text: "Asciendes dentro de la estructura — ya no puedes salir fácil", points: -2, next: 4 }
+    ]},
+    { year: "Un año después", text: "Consigues trabajo en una fábrica con ayuda de un programa del municipio. Ganas poco. Pero estás fuera del conflicto.", decision: "¿Aprovechas para estudiar?", choices: [
+      { text: "Sí, te inscribes en el SENA en las noches", points: 2, next: 5 },
+      { text: "No, el cansancio no te deja", points: 0, next: 6 }
+    ]},
+    { year: "Intento de salida", text: "Salirte de la banda no es fácil. Te amenazan. Tienes que irte del barrio con tu familia. Empiezas de cero en otro lado.", decision: null, choices: [], ending: "neutral" },
+    { year: "Dentro del conflicto", text: "Quedaste atrapado en la estructura armada. A los 22 años, en una operación policial, terminas capturado. Tu historia se convierte en una estadística del conflicto urbano.", decision: null, choices: [], ending: "bad" },
+    { year: "Salida real", text: "Años difíciles, pero lograste salir adelante. Tu historia muestra que las oportunidades legales, aunque escasas, existen. Te conviertes en ejemplo en tu comunidad.", decision: null, choices: [], ending: "good" },
+    { year: "Trabajo sin estudio", text: "Seguiste trabajando. La vida fue difícil pero estable. No lograste todo lo que soñabas, pero saliste del ciclo de violencia.", decision: null, choices: [], ending: "neutral" }
+  ]},
+  { name: "Habitante civil", place: "zona de conflicto", badge: "background:#fef0f0;color:#501313", scenes: [
+    { year: "Meta, 1998", text: "Tu pueblo está en medio de una zona donde la guerrilla y los paramilitares disputan el control. Ambos grupos llegan por turnos y exigen colaboración. Nadie te dio a escoger en qué zona nacer.", decision: "¿Qué estrategia adoptas?", choices: [
+      { text: "Intentas mantenerte neutral y no hablar con ningún grupo", points: 0, next: 1 },
+      { text: "Te unes a la Junta de Acción Comunal para negociar colectivamente", points: 1, next: 2 }
+    ]},
+    { year: "Dos años después", text: "La neutralidad no existe en zonas de conflicto. Ambos grupos te consideran sospechoso. Una masacre ocurre en el pueblo vecino. El miedo paraliza a tu comunidad.", decision: "¿Qué haces?", choices: [
+      { text: "Huyes antes de que llegue la violencia a tu pueblo", points: 0, next: 3 },
+      { text: "Te quedas y organizas una guardia civil no armada", points: 1, next: 4 }
+    ]},
+    { year: "Con la JAC", text: "La organización comunitaria generó algo de protección. Lograron que organizaciones de derechos humanos visitaran el pueblo. Hay más visibilidad.", decision: "¿Denuncias ante la Fiscalía?", choices: [
+      { text: "Sí, con apoyo de una ONG presentan denuncias formales", points: 2, next: 5 },
+      { text: "No, el miedo a represalias es demasiado grande", points: 0, next: 6 }
+    ]},
+    { year: "Desplazamiento", text: "Te convertiste en desplazado. Una de las 8 millones de víctimas del conflicto colombiano. Perdiste tu tierra, tu comunidad y tu historia.", decision: null, choices: [], ending: "bad" },
+    { year: "Resistencia civil", text: "La guardia civil no armada fue reconocida internacionalmente. Tu pueblo sobrevivió el conflicto con su comunidad unida. No sin pérdidas, pero con dignidad.", decision: null, choices: [], ending: "good" },
+    { year: "Con denuncia", text: "Algunos responsables fueron investigados. El proceso fue largo y doloroso. Pero la verdad quedó registrada. La memoria histórica comenzó a construirse.", decision: null, choices: [], ending: "good" },
+    { year: "Sin denuncia", text: "El silencio protegió a algunos, pero permitió que la impunidad siguiera. La comunidad sobrevivió, fragmentada y sin justicia.", decision: null, choices: [], ending: "neutral" }
+  ]},
+  { name: "Soldado del ejército", place: "zonas de conflicto", badge: "background:#e6f1fb;color:#042C53", scenes: [
+    { year: "Colombia, 2000", text: "Eres parte del Plan Colombia. Te envían al Putumayo. Ves cómo los grupos armados tienen mejor armamento financiado con coca. El conflicto no es solo militar — es social.", decision: "¿Cómo actúas en campo?", choices: [
+      { text: "Sigues el protocolo: proteger civiles, no usar fuerza desproporcionada", points: 1, next: 1 },
+      { text: "Tu comandante presiona por resultados a cualquier costo", points: -1, next: 2 }
+    ]},
+    { year: "En operación", text: "Encuentras familias campesinas que cultivan coca por necesidad. Propones a tus superiores coordinar con programas civiles de sustitución.", decision: "¿Qué respuesta recibes?", choices: [
+      { text: "Te escuchan y tu unidad adopta un enfoque más integral", points: 2, next: 3 },
+      { text: "Te ignoran — solo importan los resultados de combate", points: 0, next: 4 }
+    ]},
+    { year: "Presión por resultados", text: "Los falsos positivos son el escándalo más grave del ejército colombiano: civiles asesinados y presentados como guerrilleros. Tu unidad empieza a recibir esas presiones.", decision: "¿Qué haces?", choices: [
+      { text: "Te niegas a participar y lo denuncias internamente", points: 1, next: 5 },
+      { text: "Obedeces órdenes — tienes miedo de las consecuencias", points: -2, next: 6 }
+    ]},
+    { year: "Enfoque integral", text: "Tu trabajo contribuyó a construir confianza entre el ejército y las comunidades. La estrategia fue más efectiva y menos sangrienta.", decision: null, choices: [], ending: "good" },
+    { year: "Sin apoyo institucional", text: "Cumpliste tu deber sin cometer abusos. Pero el sistema no cambió. Terminaste tu servicio con la conciencia tranquila pero frustrado.", decision: null, choices: [], ending: "neutral" },
+    { year: "Denuncia interna", text: "Denunciar desde adentro tuvo consecuencias para ti. Pero tu testimonio contribuyó años después a los procesos de Justicia y Paz.", decision: null, choices: [], ending: "good" },
+    { year: "Complicidad", text: "Los falsos positivos se convirtieron en uno de los crímenes más documentados del conflicto. Más de 6.400 civiles inocentes fueron asesinados.", decision: null, choices: [], ending: "bad" }
+  ]}
+];
+
+const endings = {
+  good: {
+    label: "Resististe",
+    color: "ending-good",
+    text: [
+      "Elegiste el camino más difícil pero construiste algo real. Tu historia es la de los líderes sociales que hoy siguen siendo amenazados en Colombia.",
+      "Saliste del ciclo de violencia. Demostraste que con oportunidades reales, los jóvenes no tienen por qué entrar al conflicto.",
+      "Tu comunidad resistió. Eso es lo más poderoso que puede hacer un civil en medio de la guerra.",
+      "Actuaste con integridad dentro de un sistema que muchas veces no lo permite. Eso tiene valor histórico."
+    ],
+    reflection: "La paz positiva, según Galtung, no es solo ausencia de guerra — es construir justicia social activamente. Tu personaje lo intentó."
+  },
+  neutral: {
+    label: "Sobreviviste",
+    color: "ending-neutral",
+    text: [
+      "Sobreviviste, pero el conflicto se llevó algo de ti. Millones de colombianos vivieron exactamente esto.",
+      "Saliste del conflicto pero sin llegar a tu potencial. El sistema falló antes que tú.",
+      "Viviste el conflicto sin poder transformarlo. Eso es lo que le pasó a la mayoría de los civiles.",
+      "Cumpliste sin comprometerte con lo malo ni con lo bueno. En un sistema roto, eso también tiene un costo."
+    ],
+    reflection: "La violencia estructural — invisible pero real — limitó las opciones de tu personaje desde el principio. Eso es lo que Galtung llama paz negativa: ausencia de guerra, pero no ausencia de injusticia."
+  },
+  bad: {
+    label: "El sistema te aplastó",
+    color: "ending-bad",
+    text: [
+      "Te convertiste en víctima del desplazamiento forzado. Colombia tiene más de 8 millones de desplazados — la segunda cifra más alta del mundo.",
+      "El conflicto urbano te atrapó. El responsable no eres tú — es la ausencia del Estado y la violencia estructural que no te dio opciones reales.",
+      "Fuiste una víctima directa del conflicto. Tu historia es la de las 9 millones de víctimas registradas en Colombia.",
+      "La presión institucional te llevó a participar en crímenes. Los falsos positivos costaron más de 6.400 vidas de civiles inocentes."
+    ],
+    reflection: "La violencia directa y estructural se retroalimentan. El narcotráfico no solo mató — destruyó comunidades, familias y posibilidades enteras de vida."
+  }
+};
+
+let currentRole = null;
+
+function selectRole(i) {
+  currentRole = i;
+  document.querySelectorAll('#role-cards .card').forEach((c, idx) => {
+    c.classList.toggle('selected', idx === i);
+  });
+}
+
+function startGame() {
+  if (currentRole === null) { alert('Elige un personaje primero'); return; }
+  showScreen('screen-game');
+  const r = roles[currentRole];
+  document.getElementById('role-badge-container').innerHTML =
+    `<div class="role-badge" style="${r.badge}">${r.name} — ${r.place}</div>`;
+  renderScene(0);
+}
+
+function renderScene(idx) {
+  const r = roles[currentRole];
+  const scene = r.scenes[idx];
+  const total = r.scenes.filter(s => s.decision).length;
+  const done = r.scenes.slice(0, idx).filter(s => s.decision).length;
+  document.getElementById('progress').style.width = Math.round(done / total * 100) + '%';
+  document.getElementById('scene-year').textContent = scene.year;
+  document.getElementById('scene-text').textContent = scene.text;
+  if (!scene.decision) { showEnding(scene.ending); return; }
+  document.getElementById('decision-label').textContent = scene.decision;
+  const container = document.getElementById('choices');
+  container.innerHTML = '';
+  scene.choices.forEach(ch => {
+    const d = document.createElement('div');
+    d.className = 'card';
+    d.innerHTML = `<div class="card-title">${ch.text}</div>`;
+    d.onclick = () => renderScene(ch.next);
+    container.appendChild(d);
+  });
+}
+
+function showEnding(type) {
+  showScreen('screen-ending');
+  const e = endings[type];
+  document.getElementById('ending-content').innerHTML = `
+    <div class="ending-box ${e.color}">
+      <div class="ending-title">${e.label}</div>
+      <div class="ending-text">${e.text[currentRole]}</div>
+    </div>`;
+  document.getElementById('stat-row').innerHTML = `
+    <div class="stat"><div class="stat-num">8M+</div><div class="stat-label">desplazados en Colombia</div></div>
+    <div class="stat"><div class="stat-num">9M</div><div class="stat-label">víctimas registradas</div></div>
+    <div class="stat"><div class="stat-num">60 años</div><div class="stat-label">de conflicto armado</div></div>`;
+  document.getElementById('global-reflection').textContent = e.reflection;
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function restart() { renderScene(0); showScreen('screen-game'); }
+function goToIntro() { currentRole = null; showScreen('screen-intro'); document.querySelectorAll('#role-cards .card').forEach(c => c.classList.remove('selected')); }
+</script>
+</body>
+</html>
